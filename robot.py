@@ -1,10 +1,18 @@
-from exceptions import AlreadyPlaced, BadPlacement
+from exceptions import AlreadyPlaced, BadPlacement, NotPlaced
 
+"""Orientation is tracked by numbers 0-3 (mod 4 arithmetic).  Hence, turning right moves you
+clockwise and will ADD 1 to your orientation, likewise turning left will SUBTRACT one from your
+orientation.
+"""
 F_ORIENTATION_MAPPING = {
     "NORTH": 0,
     "EAST": 1,
     "SOUTH": 2,
-    "WEST": 3
+    "WEST": 3,
+}
+F_ORIENTATION_TURN_RATE = {
+    "RIGHT": 1,
+    "LEFT": -1,
 }
 
 
@@ -40,6 +48,15 @@ class Robot():
                 # TODO replace with a nice log
                 print("Robot can't be placed here, out of bounds.")
                 return False
+
+        if command.directive in ["LEFT", "RIGHT"]:
+            try:
+                self.execute_rotate_command(command)
+            except NotPlaced:
+                # TODO replace with a nice log
+                print("Can't rotate, no robot placed.")
+                return False
+
         return True
 
     def execute_place_command(self, command, board):
@@ -55,3 +72,9 @@ class Robot():
             self.is_placed = True
         else:
             raise BadPlacement
+
+    def execute_rotate_command(self, command):
+        if not self.is_placed:
+            raise NotPlaced
+        self.f_orientation += F_ORIENTATION_TURN_RATE[command.directive]
+        self.f_orientation %= 4

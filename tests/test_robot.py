@@ -1,5 +1,5 @@
-from commands import PlaceCommand
-from exceptions import AlreadyPlaced, BadPlacement
+from commands import Command, PlaceCommand
+from exceptions import AlreadyPlaced, BadPlacement, NotPlaced
 from unittest.mock import Mock
 
 import pytest
@@ -72,3 +72,34 @@ def test_process_command_for_place_failure_returns_false_bad_placement(monkeypat
     mock.side_effect = BadPlacement()
     monkeypatch.setattr(Robot, "execute_place_command", lambda x, y, z: mock())
     assert robot.process_command(place_command, board) is False
+
+
+@pytest.mark.parametrize("start, command, end", [
+    ("NORTH", "RIGHT", 1),  # 0 + 1 == 1
+    ("WEST", "RIGHT", 0),  # 3 + 1 == 0
+    ("EAST", "LEFT", 0),  # 1 - 1 == 0
+    ("NORTH", "LEFT", 3),  # 0 - 1 == 3
+])
+def test_execute_rotate_command_success(robot_board, start, command, end):
+    robot, board = robot_board
+    robot.execute_place_command(PlaceCommand("PLACE", 0, 0, start), board)
+    robot.execute_rotate_command(Command(command))
+    assert robot.f_orientation == end
+
+
+def test_execute_rotate_command_raises_not_placed(robot_board):
+    robot, board = robot_board
+    with pytest.raises(NotPlaced):
+        robot.execute_rotate_command(Command("RIGHT"))
+
+
+@pytest.mark.parametrize("directive", ["LEFT", "RIGHT"])
+def test_process_command_returns_true_for_valid_rotation_commands(robot_board, directive):
+    robot, board = robot_board
+    robot.execute_place_command(PlaceCommand("PLACE", 0, 0, "NORTH"), board)
+    assert robot.process_command(Command(directive), board) is True
+
+
+def test_process_command_returns_false_for_rotation_without_placement(robot_board):
+    robot, board = robot_board
+    assert robot.process_command(Command("RIGHT"), board) is False

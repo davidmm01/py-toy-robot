@@ -4,3 +4,7 @@ class AlreadyPlaced(Exception):
 
 class BadPlacement(Exception):
     pass
+
+
+class NotPlaced(Exception):
+    pass
