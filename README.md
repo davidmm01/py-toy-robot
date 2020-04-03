@@ -22,7 +22,7 @@ The program assumes that there will be no blank lines between commands in the in
 
 Given you have followed the set-up instructions, from your virtual environment simply run the following:
 
-`python3 toy_robot.py <YOUR INPUT FILE>`
+`python3 main.py <YOUR INPUT FILE>`
 
 ## Run The Tests
 

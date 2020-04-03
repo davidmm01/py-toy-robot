@@ -2,7 +2,7 @@ import sys
 
 import pytest
 
-from toy_robot import get_cli_arguments
+from main import get_cli_arguments
 
 
 def test_get_cli_arguments_returns_supplied_filename(monkeypatch):

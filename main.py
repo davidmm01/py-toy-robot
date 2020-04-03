@@ -1,6 +1,9 @@
 import argparse
 from commands import get_commands
 
+from board import Board
+from robot import Robot
+
 
 def get_cli_arguments():
     """Retrieve user inputs from the command line.
@@ -22,8 +25,11 @@ def get_cli_arguments():
 
 def main():
     input_file_name = get_cli_arguments()
+    board = Board(0, 0, 5, 5)
+    robot = Robot()
     commands = get_commands(input_file_name)
-    print(commands)
+    for command in commands:
+        robot.process_command(command, board)
 
 
 if __name__ == "__main__":  # pragma: no cover
