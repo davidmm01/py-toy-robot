@@ -1,0 +1,8 @@
+# test support
+pytest
+pytest-cov
+pytest-isort
+pytest-flake8
+
+# environment support
+pip-tools

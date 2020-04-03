@@ -1,0 +1,5 @@
+[run]
+omit = tests/*, venv/*
+
+[report]
+fail_under = 100
