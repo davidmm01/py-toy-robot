@@ -18,16 +18,20 @@ def test_get_cli_arguments_causes_exit_when_missing_file(monkeypatch):
 
 @pytest.mark.parametrize("input_file, expected_output", [
     # all commands valid, traverses the outside of board, always turning right towards centre
-    ("1.txt", "2,2,NORTH\n"),
+    ("end_to_end/1.txt", "2,2,NORTH\n"),
     # all commands valid, random path with many turns
-    ("2.txt", "3,3,WEST\n"),
+    ("end_to_end/2.txt", "3,3,WEST\n"),
     # random path with many illegal moves and places ignored
-    ("3.txt", "4,4,EAST\n"),
+    ("end_to_end/3.txt", "4,4,EAST\n"),
     # test invalid command
-    ("4.txt", "INVALID COMMAND SUPPLIED, EXITING...\n"),
+    ("end_to_end/4.txt", "INVALID COMMAND SUPPLIED, EXITING...\n"),
+    # example scenarios from the spec
+    ("in_spec_examples/a.txt", "0,1,NORTH\n"),
+    ("in_spec_examples/b.txt", "0,0,WEST\n"),
+    ("in_spec_examples/c.txt", "3,3,NORTH\n"),
 ])
 def test_main_end_to_end(monkeypatch, capsys, input_file, expected_output):
-    monkeypatch.setattr(sys, "argv", ["main.py", f"tests/end_to_end/{input_file}"])
+    monkeypatch.setattr(sys, "argv", ["main.py", f"tests/{input_file}"])
     main()
     captured = capsys.readouterr()
     assert captured.out == expected_output
