@@ -4,11 +4,15 @@ STD_LEGAL_COMMANDS = ["MOVE", "LEFT", "RIGHT", "REPORT"]
 
 
 class Command():
+    """Base class for Command objects.
+    """
     def __init__(self, directive):
         self.directive = directive
 
 
 class PlaceCommand(Command):
+    """Extension of Command to perform place commands which require more parameters.
+    """
     def __init__(self, directive, x_init, y_init, f_init):
         super().__init__(directive)
         self.x_init = int(x_init)
