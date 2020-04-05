@@ -15,7 +15,7 @@ Once you have python installed, it is my recommendation you create a virtual env
 
 ## Program input
 
-This program recieves its input by reading a file.  This files name must be passed as a command line argument to the program.  
+This program receives its input by reading a file.  This files name must be passed as a command line argument to the program.  
 The program assumes that there will be no blank lines between commands in the input file.
 
 ## Run The Program

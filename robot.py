@@ -28,7 +28,9 @@ class Robot():
         self.is_placed = False
 
     def process_command(self, command, board):
-        """Coordinates the execution of commands passed to the robot.
+        """Coordinates the execution of commands passed to the robot.  Matches the directive to
+        the appropriate execute command.  Does no validation or changes of robot state itself.
+
         Args:
             command (Command or PlaceCommand class instance)
             board (Board class instance)
@@ -66,6 +68,10 @@ class Robot():
             except IllegalMove:
                 # TODO replace with a nice log
                 print("Can't move, will fall off table.")
+
+        elif command.directive == "REPORT":
+            self.execute_report_command(command)
+            return True
 
         return False
 
@@ -119,3 +125,14 @@ class Robot():
             self.y_coord = new_y
         else:
             raise IllegalMove
+
+    def execute_report_command(self, command):
+        if not self.is_placed:
+            print("ROBOT HAS NOT BEEN PLACED")
+            return
+        # TODO better to have new functions orientation_int_to_label and vis versa
+        for label, number in F_ORIENTATION_MAPPING.items():
+            if number == self.f_orientation:
+                report_label = label
+                break
+        print(f"{self.x_coord},{self.y_coord},{report_label}")

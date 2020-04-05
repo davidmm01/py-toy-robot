@@ -152,3 +152,23 @@ def test_process_command_returns_false_for_illegal_move(robot_board):
     robot, board = robot_board
     robot.execute_place_command(PlaceCommand("PLACE", 0, 5, "NORTH"), board)
     assert robot.process_command(Command("MOVE"), board) is False
+
+
+def test_execute_report_command_success(robot_board, capsys):
+    robot, board = robot_board
+    robot.execute_place_command(PlaceCommand("PLACE", 0, 0, "NORTH"), board)
+    robot.execute_report_command(Command("REPORT"))
+    captured = capsys.readouterr()
+    assert captured.out == "0,0,NORTH\n"
+
+
+def test_execute_report_command_for_not_placed(robot_board, capsys):
+    robot, board = robot_board
+    robot.execute_report_command(Command("REPORT"))
+    captured = capsys.readouterr()
+    assert captured.out == "ROBOT HAS NOT BEEN PLACED\n"
+
+
+def test_process_command_returns_true_for_valid_report_command(robot_board):
+    robot, board = robot_board
+    assert robot.process_command(Command("REPORT"), board) is True
