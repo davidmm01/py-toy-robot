@@ -1,4 +1,4 @@
-from exceptions import AlreadyPlaced, BadPlacement, NotPlaced
+from exceptions import AlreadyPlaced, BadPlacement, IllegalMove, NotPlaced
 
 """Orientation is tracked by numbers 0-3 (mod 4 arithmetic).  Hence, turning right moves you
 clockwise and will ADD 1 to your orientation, likewise turning left will SUBTRACT one from your
@@ -24,7 +24,7 @@ class Robot():
         self.x_coord = None
         self.y_coord = None
         self.f_orientation = None
-        self.board = None
+        self.board = None  # TODO this is never used since board is passed around, 1 or other...
         self.is_placed = False
 
     def process_command(self, command, board):
@@ -40,24 +40,34 @@ class Robot():
         if command.directive == "PLACE":
             try:
                 self.execute_place_command(command, board)
+                return True
             except AlreadyPlaced:
                 # TODO replace with a nice log
                 print("Robot has already been placed.")
-                return False
             except BadPlacement:
                 # TODO replace with a nice log
                 print("Robot can't be placed here, out of bounds.")
-                return False
 
-        if command.directive in ["LEFT", "RIGHT"]:
+        elif command.directive in ["LEFT", "RIGHT"]:
             try:
                 self.execute_rotate_command(command)
+                return True
             except NotPlaced:
                 # TODO replace with a nice log
                 print("Can't rotate, no robot placed.")
-                return False
 
-        return True
+        elif command.directive == "MOVE":
+            try:
+                self.execute_move_command(command, board)
+                return True
+            except NotPlaced:
+                # TODO replace with a nice log
+                print("Can't move, no robot placed.")
+            except IllegalMove:
+                # TODO replace with a nice log
+                print("Can't move, will fall off table.")
+
+        return False
 
     def execute_place_command(self, command, board):
         if self.is_placed:
@@ -78,3 +88,34 @@ class Robot():
             raise NotPlaced
         self.f_orientation += F_ORIENTATION_TURN_RATE[command.directive]
         self.f_orientation %= 4
+
+    def execute_move_command(self, command, board):
+        # TODO: this self.is_placed might be better as a function rather than a set bool?
+        if not self.is_placed:
+            raise NotPlaced
+
+        if self.f_orientation == 0:
+            new_x = self.x_coord
+            new_y = self.y_coord + 1
+
+        elif self.f_orientation == 1:
+            new_x = self.x_coord + 1
+            new_y = self.y_coord
+
+        elif self.f_orientation == 2:
+            new_x = self.x_coord
+            new_y = self.y_coord - 1
+
+        elif self.f_orientation == 3:
+            new_x = self.x_coord - 1
+            new_y = self.y_coord
+
+        # TODO: code duplication, refactor this as per the check in place command,
+        # make it the responsibility of the board to better distribute some
+        # responsibilities
+        if board.x_min <= new_x <= board.x_max and \
+                board.y_min <= new_y <= board.y_max:
+            self.x_coord = new_x
+            self.y_coord = new_y
+        else:
+            raise IllegalMove

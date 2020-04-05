@@ -1,11 +1,13 @@
 from commands import Command, PlaceCommand
-from exceptions import AlreadyPlaced, BadPlacement, NotPlaced
+from exceptions import AlreadyPlaced, BadPlacement, IllegalMove, NotPlaced
 from unittest.mock import Mock
 
 import pytest
 
 from board import Board
 from robot import Robot
+
+# TODO: refactor to a create a new fixture placed_robot_board
 
 
 @pytest.fixture
@@ -75,10 +77,10 @@ def test_process_command_for_place_failure_returns_false_bad_placement(monkeypat
 
 
 @pytest.mark.parametrize("start, command, end", [
-    ("NORTH", "RIGHT", 1),  # 0 + 1 == 1
-    ("WEST", "RIGHT", 0),  # 3 + 1 == 0
-    ("EAST", "LEFT", 0),  # 1 - 1 == 0
-    ("NORTH", "LEFT", 3),  # 0 - 1 == 3
+    ("NORTH", "RIGHT", 1),  # NORTH turn RIGHT to EAST, 0 + 1 == 1
+    ("WEST", "RIGHT", 0),  # WEST turn RIGHT to NORTH, 3 + 1 == 0
+    ("EAST", "LEFT", 0),  # EAST turn LEFT to NORTH, 1 - 1 == 0
+    ("NORTH", "LEFT", 3),  # NORTH turn LEFT to WEST, 0 - 1 == 3
 ])
 def test_execute_rotate_command_success(robot_board, start, command, end):
     robot, board = robot_board
@@ -103,3 +105,50 @@ def test_process_command_returns_true_for_valid_rotation_commands(robot_board, d
 def test_process_command_returns_false_for_rotation_without_placement(robot_board):
     robot, board = robot_board
     assert robot.process_command(Command("RIGHT"), board) is False
+
+
+@pytest.mark.parametrize("orientation, expected_x, expected_y", [
+    # robot always starts at 1,1
+    ("NORTH", 1, 2),  # robot is NORTH: only y should increase
+    ("SOUTH", 1, 0),  # robot is SOUTH: only y should decrease
+    ("EAST", 2, 1),  # robot is EAST: only x should increase
+    ("WEST", 0, 1),  # robot is WEST: only x should decrease
+])
+def test_execute_move_command_moves_to_correct_coords(
+        robot_board, orientation, expected_x, expected_y):
+    robot, board = robot_board
+    robot.execute_place_command(PlaceCommand("PLACE", 1, 1, orientation), board)
+    robot.execute_move_command(Command("MOVE"), board)
+    robot.x_coord == expected_x
+    robot.y_coord == expected_y
+
+
+def test_execute_move_command_when_not_placed_gives_error(robot_board):
+    robot, board = robot_board
+    with pytest.raises(NotPlaced):
+        robot.execute_move_command(Command("MOVE"), board)
+
+
+def test_execute_move_command_when_move_results_in_off_table(robot_board):
+    robot, board = robot_board
+    robot.execute_place_command(PlaceCommand("PLACE", 0, 5, "NORTH"), board)
+    # note robot is placed at very top of board facing north and is asked to move
+    with pytest.raises(IllegalMove):
+        robot.execute_move_command(Command("MOVE"), board)
+
+
+def test_process_command_returns_true_for_valid_move_command(robot_board):
+    robot, board = robot_board
+    robot.execute_place_command(PlaceCommand("PLACE", 0, 0, "NORTH"), board)
+    assert robot.process_command(Command("MOVE"), board) is True
+
+
+def test_process_command_returns_false_for_move_not_placed_robot(robot_board):
+    robot, board = robot_board
+    assert robot.process_command(Command("MOVE"), board) is False
+
+
+def test_process_command_returns_false_for_illegal_move(robot_board):
+    robot, board = robot_board
+    robot.execute_place_command(PlaceCommand("PLACE", 0, 5, "NORTH"), board)
+    assert robot.process_command(Command("MOVE"), board) is False
