@@ -10,7 +10,7 @@ from robot import Robot, orientation_int_to_label
 
 @pytest.fixture
 def robot_board():
-    board = Board(0, 0, 5, 5)
+    board = Board(0, 0, 4, 4)
     robot = Robot()
     return robot, board
 
@@ -25,7 +25,7 @@ def placed_robot_board(robot_board):
 @pytest.mark.parametrize("place_command, x, y, f", [
     (PlaceCommand("PLACE", 0, 0, "NORTH"), 0, 0, 0),
     (PlaceCommand("PLACE", 1, 1, "EAST"), 1, 1, 1),
-    (PlaceCommand("PLACE", 5, 5, "SOUTH"), 5, 5, 2),
+    (PlaceCommand("PLACE", 4, 4, "SOUTH"), 4, 4, 2),
     (PlaceCommand("PLACE", 0, 1, "WEST"), 0, 1, 3),
 ])
 def test_execute_place_command_successfully(robot_board, place_command, x, y, f):
@@ -47,7 +47,7 @@ def test_execute_place_command_when_robot_already_placed(placed_robot_board):
 
 def test_execute_place_command_to_off_board_coord(robot_board):
     robot, board = robot_board
-    place_command = PlaceCommand("PLACE", 6, 6, "NORTH")
+    place_command = PlaceCommand("PLACE", 5, 5, "NORTH")
     with pytest.raises(BadPlacement):
         robot._execute_place_command(place_command, board)
 
@@ -131,7 +131,7 @@ def test_execute_move_command_when_not_placed_gives_error(robot_board):
 
 def test_execute_move_command_when_move_results_in_off_table(robot_board):
     robot, board = robot_board
-    robot._execute_place_command(PlaceCommand("PLACE", 0, 5, "NORTH"), board)
+    robot._execute_place_command(PlaceCommand("PLACE", 0, 4, "NORTH"), board)
     # note robot is placed at very top of board facing north and is asked to move
     with pytest.raises(IllegalMove):
         robot._execute_move_command()
@@ -149,7 +149,7 @@ def test_process_command_returns_false_for_move_not_placed_robot(robot_board):
 
 def test_process_command_returns_false_for_illegal_move(robot_board):
     robot, board = robot_board
-    robot._execute_place_command(PlaceCommand("PLACE", 0, 5, "NORTH"), board)
+    robot._execute_place_command(PlaceCommand("PLACE", 0, 4, "NORTH"), board)
     assert robot.process_command(Command("MOVE"), board) is False
 
 

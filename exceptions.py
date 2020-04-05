@@ -13,6 +13,11 @@ class IllegalMove(Exception):
     pass
 
 
+class InvalidCommand(Exception):
+    """Raised when a command in the input file is not valid."""
+    pass
+
+
 class NotPlaced(Exception):
     """Raised when an action that requires a placed robot is performed on an unplaced robot."""
     pass

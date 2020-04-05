@@ -1,4 +1,6 @@
+import logging
 import re
+from exceptions import InvalidCommand
 
 STD_LEGAL_COMMANDS = ["MOVE", "LEFT", "RIGHT", "REPORT"]
 
@@ -31,12 +33,16 @@ def generate_command(line):
         implies end of command list.
     """
     if line == "":
+        logging.info(f"EOF marker reached")
         return None
     elif line in STD_LEGAL_COMMANDS:
         return Command(line)
     elif re.match(r"PLACE [0-9]+,[0-9]+,((NORTH)|(EAST)|(SOUTH)|(WEST))$", line) is not None:
         args = re.split('[ ,]', line)
         return PlaceCommand(*args)
+    else:
+        logging.error(f"couldn't convert {line} into a command, exiting...")
+        raise InvalidCommand
 
 
 def get_commands(input_file_name):

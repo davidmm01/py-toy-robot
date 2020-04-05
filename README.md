@@ -18,6 +18,7 @@ Once you have python installed, it is my recommendation you create a virtual env
 This program receives its input by reading a file.  This files name must be passed as a command line argument to the program.  
 The program assumes that there will be no blank lines between commands in the input file.
 Note that valid command that are illegal for the current robot state are ignored and logged on the WARNING level.
+Note that invalid commands (those that do not correspond to a defined command) will cause the program to halt.
 
 ## Run The Program
 

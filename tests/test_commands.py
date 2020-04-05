@@ -1,4 +1,5 @@
 from commands import Command, PlaceCommand, generate_command, get_commands
+from exceptions import InvalidCommand
 
 import pytest
 
@@ -35,11 +36,15 @@ def test_generate_command_for_place_commands(line, expected_x, expected_y, expec
     "PLACE 1, 1,EAST",
     "PLACE  1,1,EAST",
     "PLACE O,0,EAST",  # non-numeric as coord init
-    "PLACE 0,O,EAST",
-    ""
+    "PLACE 0,O,EAST"
 ])
 def test_generate_command_for_bad_commands(bad_line):
-    assert generate_command(bad_line) is None
+    with pytest.raises(InvalidCommand):
+        generate_command(bad_line)
+
+
+def test_generator_command_reached_EOF():
+    assert generate_command("") is None
 
 
 @pytest.mark.parametrize("file_name, expected_num_commands", [

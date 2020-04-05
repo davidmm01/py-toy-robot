@@ -1,5 +1,6 @@
 import argparse
 from commands import get_commands
+from exceptions import InvalidCommand
 
 from board import Board
 from robot import Robot
@@ -25,9 +26,13 @@ def get_cli_arguments():
 
 def main():
     input_file_name = get_cli_arguments()
-    board = Board(0, 0, 5, 5)
+    board = Board(0, 0, 4, 4)
     robot = Robot()
-    commands = get_commands(input_file_name)
+    try:
+        commands = get_commands(input_file_name)
+    except InvalidCommand:
+        print("INVALID COMMAND SUPPLIED, EXITING...")
+        return
     for command in commands:
         robot.process_command(command, board)
 
